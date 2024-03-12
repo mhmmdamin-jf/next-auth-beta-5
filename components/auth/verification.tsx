@@ -2,7 +2,7 @@
 import { verifyEmail } from "@/actions/verification";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
-import { BounceLoader } from "react-spinners";
+import BounceLoader from "react-spinners/BounceLoader";
 import { FormError, FormSuccess } from "../FormMessages";
 export default function VerificationContent() {
   const searchParams = useSearchParams();
