@@ -1,0 +1,82 @@
+// prisma/schema.prisma
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  User
+  Admin
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model User {
+  id                    String                 @id @default(cuid()) @unique
+  name                  String?
+  email                 String?                @unique
+  emailVerified         DateTime?              @map("email_verified")
+  image                 String?
+  accounts              Account[]
+  password              String?
+  Role                  UserRole               @default(User)
+  TwoFactorConfirmations TwoFactorConfirmation[]
+  TwoFactorEnabled Boolean @default(false)
+  @@map("users")
+}
+
+model VerificationToken {
+  email   String
+  token   String
+  expires DateTime
+  id      String   @unique @default(cuid())
+
+  @@unique([email, token])
+}
+
+model ResetPasswordtoken {
+  email   String
+  id      String   @unique @default(cuid())
+  token   String
+  expires DateTime
+
+  @@unique([email, id])
+}
+
+model TwoFactorToken {
+  id      String   @default(cuid()) @unique
+  email   String  
+  code   String 
+  expires DateTime
+}
+
+model TwoFactorConfirmation {
+  id     String @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade,onUpdate: Cascade)
+
+  @@unique([userId])
+}
