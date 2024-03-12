@@ -2,7 +2,7 @@
 import { verifyEmail } from "@/actions/verification";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
-import BounceLoader from "react-spinners/BounceLoader";
+import Loader from "react-spinkit";
 import { FormError, FormSuccess } from "../FormMessages";
 export default function VerificationContent() {
   const searchParams = useSearchParams();
@@ -31,7 +31,7 @@ export default function VerificationContent() {
   );
   return (
     <div>
-      {!success && !error && <BounceLoader />}
+      {!success && !error && <Loader name="folding-cube" />}
       {success && <FormSuccess message={success} />}
       {!success && error && <FormError message={error} />}
     </div>
