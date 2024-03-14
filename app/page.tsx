@@ -12,7 +12,7 @@ export default function Home() {
       )}
     >
       <div>
-        <LoginButton modal asChild>
+        <LoginButton mode="modal" asChild>
           <Button>Sign In</Button>
         </LoginButton>
       </div>
