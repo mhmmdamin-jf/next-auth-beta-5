@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 // import Loader from "react-spinkit";
 import { FormError, FormSuccess } from "../FormMessages";
+import { BeatLoader } from "react-spinners";
 export default function VerificationContent() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | undefined>();
@@ -31,10 +32,7 @@ export default function VerificationContent() {
   );
   return (
     <div>
-      {
-        !success && !error && <p>loading</p>
-        // <Loader name="folding-cube" />
-      }
+      {!success && !error && <BeatLoader />}
       {success && <FormSuccess message={success} />}
       {!success && error && <FormError message={error} />}
     </div>
