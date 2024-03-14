@@ -13,7 +13,6 @@ export const settings = async (values: zod.infer<typeof settingsSchema>) => {
   }
 
   const { id, email } = exitingUser;
-  //console.log(exitingUser);
   if (exitingUser.oauth) {
     values.password = undefined;
   }
