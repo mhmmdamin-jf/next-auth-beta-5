@@ -1,39 +1,50 @@
 import NextAuth from "next-auth";
+
+import authConfig from "@/auth.config";
 import {
   Default_Redirect_Route,
-  apiAuthPrefixRoutes,
+  apiAuthPrefixRoute,
   authRoutes,
   publicRoutes,
 } from "@/routes";
-import authConfig from "./auth.config";
+
 const { auth } = NextAuth(authConfig);
+
 export default auth((req) => {
-  const isLoggedIn = !!req.auth;
   const { nextUrl } = req;
+  const isLoggedIn = !!req.auth;
+
+  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefixRoute);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-  const isApiRoute = nextUrl.pathname.startsWith(apiAuthPrefixRoutes[0]);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
-  if (isApiRoute) {
-    return null;
+
+  if (isApiAuthRoute) {
+    return;
   }
 
-  if (isLoggedIn && isAuthRoute) {
-    return Response.redirect(new URL(Default_Redirect_Route, nextUrl));
-  }
-  if (!isLoggedIn) {
-    if (!isPublicRoute && !isAuthRoute) {
-      let callBackUrl = nextUrl.pathname;
-      if (nextUrl.search) {
-        callBackUrl += encodeURIComponent(nextUrl.search);
-      }
-      return Response.redirect(
-        new URL(`/login?callBackUrl=${callBackUrl}`, nextUrl),
-      );
+  if (isAuthRoute) {
+    if (isLoggedIn) {
+      return Response.redirect(new URL(Default_Redirect_Route, nextUrl));
     }
-    return null;
+    return;
   }
-  return null;
+
+  if (!isLoggedIn && !isPublicRoute) {
+    let callbackUrl = nextUrl.pathname;
+    if (nextUrl.search) {
+      callbackUrl += nextUrl.search;
+    }
+
+    const encodedCallbackUrl = encodeURIComponent(callbackUrl);
+
+    return Response.redirect(
+      new URL(`/auth/login?callbackUrl=${encodedCallbackUrl}`, nextUrl),
+    );
+  }
+
+  return;
 });
+
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };

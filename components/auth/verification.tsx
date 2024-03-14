@@ -31,7 +31,10 @@ export default function VerificationContent() {
   );
   return (
     <div>
-      {!success && !error && <p>loading</p>}
+      {
+        !success && !error && <p>loading</p>
+        // <Loader name="folding-cube" />
+      }
       {success && <FormSuccess message={success} />}
       {!success && error && <FormError message={error} />}
     </div>

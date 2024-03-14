@@ -20,10 +20,10 @@ export default function UserInfo({ user }: { user: ExtendedUser | undefined }) {
         <p>Role:</p>
         <p>{user?.Role}</p>
       </div>
-      <div className="flex w-full justify-between rounded-md border border-stone-300 px-12 py-2 shadow-sm">
+      <div className="flex  w-full justify-between rounded-md border border-stone-300 px-12 py-2 shadow-sm">
         <p>2FA:</p>
-        <Badge variant={user?.TwoFactorEnabled ? "emraled" : "destructive"}>
-          {user.TwoFactorEnabled ? "ON" : "OFF"}
+        <Badge variant={user?.TwoFactorEnabled ? "emerald" : "destructive"}>
+          {user?.TwoFactorEnabled ? "ON" : "OFF"}
         </Badge>
       </div>
     </div>

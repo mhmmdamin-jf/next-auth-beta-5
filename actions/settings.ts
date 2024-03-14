@@ -11,24 +11,26 @@ export const settings = async (values: zod.infer<typeof settingsSchema>) => {
   if (!exitingUser || !exitingUser.id) {
     return { error: "unauthorized." };
   }
+
   const { id, email } = exitingUser;
+  //console.log(exitingUser);
   if (exitingUser.oauth) {
     values.password = undefined;
   }
-  if (values.newPassword && exitingUser.password) {
+  if (values.newPassword && exitingUser.password && values.password) {
     const compar = await compare(values.password, exitingUser.password);
 
     if (compar) {
       values.password = await hash(values.newPassword, 12);
+      values.newPassword = undefined;
       const updatedUser = await db.user.update({
         where: { id: exitingUser.id },
         data: {
           ...exitingUser,
           ...values,
-          newPassword: undefined,
-          oauth: undefined,
         },
       });
+
       unstable_update({
         user: {
           email: updatedUser.email,
@@ -42,15 +44,13 @@ export const settings = async (values: zod.infer<typeof settingsSchema>) => {
       return { error: "password in incorrect." };
     }
   }
-
+  values.newPassword = undefined;
   const updatedUser = await db.user.update({
     where: { id: id },
     data: {
       ...exitingUser,
       ...values,
       password: exitingUser.password,
-      newPassword: undefined,
-      oauth: undefined,
     },
   });
 
@@ -62,8 +62,8 @@ export const settings = async (values: zod.infer<typeof settingsSchema>) => {
       TwoFactorEnabled: updatedUser.TwoFactorEnabled,
     },
   });
-  if (email !== values.email) {
-    values.emailVerified = null;
+  if (values.email && email !== values.email) {
+    await db.user.update({ where: { id: id }, data: { emailVerified: null } });
     const verificationToken = await generateVerificationToken({
       email: values.email,
     });

@@ -23,3 +23,5 @@ export const getTwoFactorTokenByEmail = async (email: string) =>
   await db.twoFactorToken.findFirst({ where: { email: email } });
 export const getTwoFactorTokenByToken = async (code: string) =>
   await db.twoFactorToken.findFirst({ where: { code: code } });
+export const getAccountByUserId = async (userId: string) =>
+  await db.account.findFirst({ where: { userId } });

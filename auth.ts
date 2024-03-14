@@ -2,7 +2,11 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
 import authConfig from "./auth.config";
 import { db } from "./lib/db";
-import { getTwoFactorConfirmationById, getUserByEmail } from "./lib/data";
+import {
+  getAccountByUserId,
+  getTwoFactorConfirmationById,
+  getUserByEmail,
+} from "./lib/data";
 import { UserRole } from "@prisma/client";
 export const {
   handlers: { GET, POST },
@@ -48,7 +52,7 @@ export const {
       }
       return true;
     },
-    async jwt({ token, account, user, profile, session, trigger }) {
+    async jwt({ token }) {
       if (!token.sub) {
         return token;
       }
@@ -64,7 +68,9 @@ export const {
           token.Role = foundedUser?.Role;
           token.TwoFactorEnabled = foundedUser?.TwoFactorEnabled;
         }
-        if (account?.type !== "credentials") {
+        token.oauth = false;
+        const exitingAccount = await getAccountByUserId(foundedUser.id);
+        if (exitingAccount) {
           token.oauth = true;
         }
       }
@@ -77,7 +83,7 @@ export const {
         session.user.TwoFactorEnabled =
           sessionToken.TwoFactorEnabled as boolean;
         session.user.oauth = sessionToken.oauth as boolean;
-        session.user.password = sessionToken.password;
+        session.user.password = sessionToken.password as string;
       }
       if (sessionToken.sub) {
         session.user.id = sessionToken.sub;
